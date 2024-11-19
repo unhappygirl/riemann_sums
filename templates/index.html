@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double integrals!</title>
+    <h> Take a look at this beautiful graph! </h>
+</head>
+<body>
+    <canvas id="plotCanvas" width="500" height="500"></canvas>
+    <div class="input_">
+        <label>
+            <h1>
+                input some function in terms of x and z, (e.g x+z or x**2+z**2)
+            </h1>
+            <input type="text" id="funcinput">
+        </label>
+    </div> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gl-matrix@2.8.1/dist/gl-matrix-min.js"></script>
+    <script src="static/_math.js"></script>
+    <script src="static/plotter.js"></script>
+</body>
+</html>

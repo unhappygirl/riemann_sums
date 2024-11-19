@@ -1,0 +1,66 @@
+/* General body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0a0104;  /* Light background color */
+}
+
+/* Styling for the header */
+h {
+    text-align: center;
+    font-size: 2em;
+    color: #ce60c8;
+    margin: 20px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for the canvas */
+canvas#plotCanvas {
+    display: block;
+    margin: 20px auto; /* Center the canvas horizontally */
+    border: 4px solid rgba(231, 68, 136, 0.5);  /* Groovy frame with transparency */
+    border-radius: 12px;  /* Rounded corners for a fun style */
+    box-shadow: 0 0 20px rgba(66, 0, 121, 0.6); /* Glowing shadow for a groovy effect */
+    background-color: #000;  /* Set a black background for the canvas */
+    width: 800px;  /* Set canvas width to 50% of the viewport width */
+    height: 600px;  /* Set canvas height to 80% of the viewport height (more vertical aspect ratio) */
+    max-width: 1000px; /* Optional: Prevent canvas from becoming too large */
+    max-height: 1200px; /* Optional: Prevent canvas from becoming too large */
+}
+
+.input_ label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px 0;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    color: #ffffff; /* Text color */
+}
+
+.input_ label input {
+    padding: 8px;
+    border: 2px solid #666;
+    border-radius: 4px;
+    margin-top: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    width: 20%; /* Expand to full width of container */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.input_ label input:focus {
+    border-color: #0078ff; /* Highlight color on focus */
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 120, 255, 0.5);
+}
+
+
+/* Make sure the canvas takes up enough space */
+@media screen and (max-width: 768px) {
+    canvas#plotCanvas {
+        width: 90vw;  /* Slightly larger canvas on small screens */
+        height: 75vh;
+    }
+}
