@@ -1,9 +1,9 @@
-/* General body styling */
+
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #0a0104;  /* Light background color */
+    background-color: #0a0104; 
 }
 
 /* Styling for the header */
@@ -12,7 +12,7 @@ h {
     font-size: 2em;
     color: #ce60c8;
     margin: 20px 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(241, 18, 18, 0.2);
 }
 
 /* Styling for the canvas */
@@ -27,6 +27,13 @@ canvas#plotCanvas {
     height: 600px;  /* Set canvas height to 80% of the viewport height (more vertical aspect ratio) */
     max-width: 1000px; /* Optional: Prevent canvas from becoming too large */
     max-height: 1200px; /* Optional: Prevent canvas from becoming too large */
+
+}
+
+.input_ {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }
 
 .input_ label {
@@ -46,7 +53,7 @@ canvas#plotCanvas {
     margin-top: 5px;
     font-size: 14px;
     font-family: inherit;
-    width: 20%; /* Expand to full width of container */
+    width: 30%; /* Expand to full width of container */
     box-sizing: border-box; /* Include padding in width */
 }
 
@@ -54,6 +61,37 @@ canvas#plotCanvas {
     border-color: #0078ff; /* Highlight color on focus */
     outline: none;
     box-shadow: 0 0 5px rgba(0, 120, 255, 0.5);
+}
+
+.options {
+    display: flex;              /* Flexbox layout to align items vertically */
+    flex-direction: column;     /* Stack items vertically */
+    align-items: center;        /* Center align content horizontally */
+    justify-content: center;    /* Center items vertically */
+    margin-top: 10px;           /* Space above the options container */
+    padding: 10px;              /* Padding inside the border */
+    border: 2px solid #ce60c8;  /* Set border width */
+    border-radius: 4px;         /* Rounded corners */
+    width: 220px;               /* Set fixed width for the container */
+    max-width: 100%;            /* Prevent it from becoming too wide */
+    box-sizing: border-box;     /* Ensure padding and border are included in the width calculation */
+}
+
+.options input {
+    
+}
+
+
+
+select {
+    width: 200px; /* Optional: Set a fixed width for the select box */
+    text-align: center;
+    margin-top: 5px;
+    padding: 5px;
+    border: 2px solid #666; /* Style to match other inputs */
+    border-radius: 4px;     /* Rounded corners */
+    font-size: 14px;        /* Font size matching design */
+    background-color: #f4f4f4; /* Optional: Background color */
 }
 
 

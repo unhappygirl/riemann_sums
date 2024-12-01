@@ -2,17 +2,47 @@
 
 const SAMPLE_RATE = 20
 
+const WHITE = [1.0, 1.0, 1.0, 1]
+const BLACK = [0, 0, 0, 1]
+const PRISM_COLOR = [0, 1, 0, 0.03]
+const GRAPH_COLOR = [0, 0, 0, 1]
+const LINE_COLOR = [0, 1, 0.8, 0.4]
 
-function get_func() {
-    let input = document.getElementById("funcinput");
-    return input.value;
+
+
+class MyBuilder {
+    constructor(graph) {
+        this.graph = graph
+    }
+
+    buildGraph(xinterval, zinterval) {
+        const rate = SAMPLE_RATE;
+        const vertices = this.graph.sample(xinterval, zinterval, rate).flat()
+        let samplesX = (xinterval[1]-xinterval[0])*rate + 1
+        let samplesZ = (zinterval[1]-zinterval[0])*rate + 1
+        
+        // Generate indices for grid tessellation
+        // Example indices for two triangles forming a quad
+        const indices = graphTesellation(samplesX, samplesZ)
+    
+        return { vertices, indices };
+    }
+
+    buildRiemann(...args) {
+        const data = this.graph.riemannPrisms(...args)
+        const vertices = data.vertices.flat()
+        const rectIndices = rectPrismTesellation( data.vertices.length / 8 )
+        const _lineIndices = riemannPrismEdgeIndices(data.vertices)
+        return { vertices, rectIndices, _lineIndices}
+    }
 }
 
-
+// class too large, fix by extract subclass
 class MyOpenGLController {
 
-    constructor(intervals) {
-        this.intervals = intervals
+    constructor(intervals, graph) {
+        this.intervals = intervals;
+        this.builder = new MyBuilder(graph);
         this.getContext();
         this.initShaderSrc();
         this.vertexShader = this.createShader(this.gl.VERTEX_SHADER, this.vertexShaderSource);
@@ -32,35 +62,8 @@ class MyOpenGLController {
     }
 
     initShaderSrc() {
-        this.vertexShaderSource = `
-            attribute vec3 position;
-            uniform mat4 modelViewMatrix;
-            uniform mat4 projectionMatrix;
-            uniform mat4 viewMatrix;
-            varying vec4 v_color;
-    
-            void main() {
-                // Normalize the y position in the range [-5, 5] to [0, 1]
-                float normalizedY = (position.x + 5.0) / 10.0;  // (-5 to 5) maps to (0 to 1)
-
-                // Set the color with the normalized y value affecting the b component
-                v_color = vec4(1.0, normalizedY, normalizedY, 1.0);
-
-                // Transform the vertex position with the model, view, and projection matrices
-                gl_Position = projectionMatrix * viewMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-        `;
-    
-    
-        this.fragmentShaderSource = `
-            precision mediump float;
-            varying vec4 v_color;
-    
-            void main() {
-                gl_FragColor = v_color;
-            }
-        `;
-    
+        this.vertexShaderSource = vertexShader
+        this.fragmentShaderSource = fragmentShader
     }
 
     createShader(type, source) {
@@ -84,8 +87,6 @@ class MyOpenGLController {
         this.projectionMatrix = mat4.create();
         mat4.perspective(this.projectionMatrix, this.fieldOfView, this.aspect, this.zNear, this.zFar);
     
-        this.modelViewMatrix = mat4.create();
-        mat4.translate(this.modelViewMatrix, this.modelViewMatrix, [-0.0, 0.0, -6.0]);
     
         this.viewMatrix = mat4.create();
     }
@@ -101,22 +102,28 @@ class MyOpenGLController {
     }
 
     initBuffers() {
-        this.vertexBuffer = this.gl.createBuffer();
         this.indexBuffer = this.gl.createBuffer();
-        this.axesBuffer = this.gl.createBuffer()
-        
+        this.vertexBuffer = this.gl.createBuffer();
+        this.axesBuffer = this.gl.createBuffer();
+        this.gridBuffer = this.gl.createBuffer();
+        this.riemannBuffer = this.gl.createBuffer();
     }
 
-    populateBuffers(vertices, indices) {
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
+    bufferArray(buffer, src, mode) {
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(src), mode);
+    }
 
+    populateVertexBuffers(graphVertices, riemannVertices) {
+        this.bufferArray(this.vertexBuffer, graphVertices, this.gl.STATIC_DRAW)
+        this.bufferArray(this.axesBuffer, axisVertices(100), this.gl.STATIC_DRAW)
+        this.bufferArray(this.gridBuffer, Array(0), this.gl.STATIC_DRAW)
+        this.bufferArray(this.riemannBuffer, riemannVertices, this.gl.STATIC_DRAW)
+    }
+
+    populateIndexBuffer(index_array) {
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);
-    
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.axesBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(axisVertices(100)), this.gl.STATIC_DRAW);
-        //console.log(axisVertices(...this.intervals), "wowww");
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(index_array), this.gl.STATIC_DRAW);    
     }
     
 
@@ -135,72 +142,36 @@ class MyOpenGLController {
             mat4.lookAt(this.viewMatrix, this.cameraPos, this.cameraTarget, this.cameraUp);
         } catch (error) {
             console.error('Error in mat4.lookAt:', error);
-            //console.log('Inputs: CameraPos:', this.cameraPos, 'Target:', this.cameraTarget, 'Up:', this.cameraUp);
             throw error; // Re-throw to stop execution
         }
     }
 
-    tesellateGraph(graph) {
-        const rate = SAMPLE_RATE;
-        let xinterval = this.intervals[0];
-        let zinterval = this.intervals[2];
-        const vertices = graph.sample(xinterval, zinterval, rate).flat()
-        let samplesX = (xinterval[1]-xinterval[0])*rate + 1
-        let samplesZ = (zinterval[1]-zinterval[0])*rate + 1
-        
-        // Generate indices for grid tessellation
-        // Example indices for two triangles forming a quad
-        const indices = tesellation(samplesX, samplesZ)
-    
-        return { vertices, indices };
-    }
-
     checkProgram() {
-        console.log('my Program:', this.program);
+        //console.log('my Program:', this.program);
     
         if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
             console.error('Program link error:', this.gl.getProgramInfoLog(program));
         }
         
-        const uModelViewMatrix = this.gl.getUniformLocation(this.program, 'modelViewMatrix');
         const uProjectionMatrix = this.gl.getUniformLocation(this.program, 'projectionMatrix');
         const uViewMatrix = this.gl.getUniformLocation(this.program, 'viewMatrix');
     
-        if (!uModelViewMatrix || !uProjectionMatrix || !uViewMatrix) {
+        if (!uProjectionMatrix || !uViewMatrix) {
             console.error('Error fetching uniform locations.');
         }
     
     }
-
-    drawVertices(indices) {
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-    
+    draw(vertexBuffer, indices, mode, color) {
+        const colorPos = this.gl.getUniformLocation(this.program, "objectColor");
+        this.gl.uniform4fv(colorPos, color);
+        this.populateIndexBuffer(indices);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
         const positionAttribLocation = this.gl.getAttribLocation(this.program, "position");
         this.gl.vertexAttribPointer(positionAttribLocation, 3, this.gl.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
         this.gl.enableVertexAttribArray(positionAttribLocation);
-        
-        // Draw the vertices using indexed elements
-        this.gl.drawElements(this.gl.TRIANGLES, indices, this.gl.UNSIGNED_SHORT, 0);
-        //console.log("Drawing vertices", indices);
-        //
-    }
-    
 
-    drawAxes() {
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.axesBuffer)
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER,
-             new Uint16Array([0, 1, 2, 3, 4, 5]), this.gl.STATIC_DRAW);
-        
-        
-        const positionAttribLocation = this.gl.getAttribLocation(this.program, "position");
-        this.gl.vertexAttribPointer(positionAttribLocation, 3, 
-            this.gl.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
-        this.gl.enableVertexAttribArray(positionAttribLocation);
-        
-        // Draw the axes
-        this.gl.drawElements(this.gl.LINES, 6, this.gl.UNSIGNED_SHORT, 0)
-        //
+        // Draw the vertices using indexed elements
+        this.gl.drawElements(mode, indices.length, this.gl.UNSIGNED_SHORT, 0);
     }
 
     setupMatrices() {
@@ -208,45 +179,52 @@ class MyOpenGLController {
         const projectionMatrixLocation = this.gl.getUniformLocation(this.program, "projectionMatrix");
         this.gl.uniformMatrix4fv(projectionMatrixLocation, false, this.projectionMatrix);
     
-        const modelViewMatrixLocation  = this.gl.getUniformLocation(this.program, "modelViewMatrix");
-        this.gl.uniformMatrix4fv(modelViewMatrixLocation, false, this.modelViewMatrix);
     
         const viewMatrixLocation = this.gl.getUniformLocation(this.program, "viewMatrix");
         this.gl.uniformMatrix4fv(viewMatrixLocation, false, this.viewMatrix);
         //
     }
     
-    renderGraph(graph, angle) {
+    render(graph, xDrag, yDrag) {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.gl.useProgram(this.program);
 
+        let inputs = get_inputs();
+
+        xDrag += deltaX
+        yDrag += deltaY
 
         // construct the view matrix
-        let radius = this.intervals[2][1]*5
-        this.buildView([radius * Math.cos(angle), 50, radius * Math.sin(angle)]);
+        let radius = this.intervals[2][1]*3
+        this.buildView([radius * Math.cos(yDrag) * Math.cos(xDrag), radius * Math.cos(xDrag) * Math.sin(yDrag), radius * Math.sin(xDrag)]);
+        console.log(xDrag, this.cameraPos);
         //
 
         this.setupMatrices();
-        let data = this.tesellateGraph(graph);
-        //console.log(data.vertices, data.indices)
-        this.populateBuffers(data.vertices, data.indices);
-        this.drawVertices(data.indices.length);
-        this.drawAxes();
-        //console.log("camera position:", this.cameraPos)
+        let graphData = this.builder.buildGraph(this.intervals[0], this.intervals[2]);
+        let riemannData = this.builder.buildRiemann(this.intervals[0], this.intervals[1], inputs.xrects, inputs.yrects, eval(inputs.sumType));
+        this.populateVertexBuffers(graphData.vertices, riemannData.vertices);
+        this.draw(this.axesBuffer, lineIndices(6), this.gl.LINES, BLACK);
+        this.draw(this.vertexBuffer, graphData.indices, this.gl.TRIANGLES, GRAPH_COLOR);
+        if (inputs.sum) {
+            this.draw(this.riemannBuffer, riemannData.rectIndices, this.gl.TRIANGLES, PRISM_COLOR);
+            this.draw(this.riemannBuffer, riemannData._lineIndices, this.gl.LINES, LINE_COLOR);
+        }
         try {
-            graph.update_func(get_func());
+            graph.updateFunc(inputs.func);
         } catch {   
             console.log("Not today!")
         }
-        
     
-        requestAnimationFrame(() => this.renderGraph(graph, angle+0.01));
+        requestAnimationFrame(() => this.render(graph, xDrag, yDrag));
     }
 
     mainloop(graph) {
-        // do stuff here
-        //
-        this.renderGraph(graph, 0)
+        this.gl.clearColor(...WHITE)
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);  // Standard blending mode
+
+        this.render(graph, 0, 0)
     }
 
 }
@@ -254,8 +232,8 @@ class MyOpenGLController {
 
 
 function main() {
-    let controller = new MyOpenGLController([[-5, 5], [-5, 5], [-5, 5]]);
-    let mygraph = new FunctionGraph("x+z");
+    let mygraph = new FunctionGraph("Math.sqrt(x)");
+    let controller = new MyOpenGLController([[-5, 5], [-5, 5], [-5, 5]], mygraph);
     controller.mainloop(mygraph);
 }
 
