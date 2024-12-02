@@ -6,7 +6,7 @@ const WHITE = [1.0, 1.0, 1.0, 1]
 const BLACK = [0, 0, 0, 1]
 const PRISM_COLOR = [0, 1, 0, 0.03]
 const GRAPH_COLOR = [0, 0, 0, 1]
-const LINE_COLOR = [0, 1, 0.8, 0.4]
+const LINE_COLOR = [0, 0.1, 0.1, 0.4]
 
 
 
@@ -30,6 +30,7 @@ class MyBuilder {
 
     buildRiemann(...args) {
         const data = this.graph.riemannPrisms(...args)
+        document.getElementById("volume").innerText = data.volume
         const vertices = data.vertices.flat()
         const rectIndices = rectPrismTesellation( data.vertices.length / 8 )
         const _lineIndices = riemannPrismEdgeIndices(data.vertices)
@@ -104,8 +105,8 @@ class MyOpenGLController {
     initBuffers() {
         this.indexBuffer = this.gl.createBuffer();
         this.vertexBuffer = this.gl.createBuffer();
+        this.normalBuffer = this.gl.createBuffer();
         this.axesBuffer = this.gl.createBuffer();
-        this.gridBuffer = this.gl.createBuffer();
         this.riemannBuffer = this.gl.createBuffer();
     }
 
@@ -195,14 +196,21 @@ class MyOpenGLController {
         yDrag += deltaY
 
         // construct the view matrix
-        let radius = this.intervals[2][1]*3
+        let radius = this.intervals[2][1]*5
         this.buildView([radius * Math.cos(yDrag) * Math.cos(xDrag), radius * Math.cos(xDrag) * Math.sin(yDrag), radius * Math.sin(xDrag)]);
         console.log(xDrag, this.cameraPos);
         //
 
         this.setupMatrices();
         let graphData = this.builder.buildGraph(this.intervals[0], this.intervals[2]);
-        let riemannData = this.builder.buildRiemann(this.intervals[0], this.intervals[1], inputs.xrects, inputs.yrects, eval(inputs.sumType));
+        let riemannData = this.builder.buildRiemann(
+            this.intervals[0], 
+            this.intervals[1], 
+            inputs.xrects, 
+            inputs.yrects, 
+            eval(inputs.sumType)
+        );
+
         this.populateVertexBuffers(graphData.vertices, riemannData.vertices);
         this.draw(this.axesBuffer, lineIndices(6), this.gl.LINES, BLACK);
         this.draw(this.vertexBuffer, graphData.indices, this.gl.TRIANGLES, GRAPH_COLOR);
@@ -228,8 +236,6 @@ class MyOpenGLController {
     }
 
 }
-
-
 
 function main() {
     let mygraph = new FunctionGraph("Math.sqrt(x)");

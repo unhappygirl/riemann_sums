@@ -1,104 +1,53 @@
-
 body {
-    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin: 0;
-    padding: 0;
-    background-color: #0a0104; 
+    font-family: Arial, sans-serif;
 }
 
-/* Styling for the header */
-h {
-    text-align: center;
-    font-size: 2em;
-    color: #ce60c8;
-    margin: 20px 0;
-    text-shadow: 2px 2px 4px rgba(241, 18, 18, 0.2);
-}
-
-/* Styling for the canvas */
-canvas#plotCanvas {
-    display: block;
-    margin: 20px auto; /* Center the canvas horizontally */
-    border: 4px solid rgba(231, 68, 136, 0.5);  /* Groovy frame with transparency */
-    border-radius: 12px;  /* Rounded corners for a fun style */
-    box-shadow: 0 0 20px rgba(66, 0, 121, 0.6); /* Glowing shadow for a groovy effect */
-    background-color: #000;  /* Set a black background for the canvas */
-    width: 800px;  /* Set canvas width to 50% of the viewport width */
-    height: 600px;  /* Set canvas height to 80% of the viewport height (more vertical aspect ratio) */
-    max-width: 1000px; /* Optional: Prevent canvas from becoming too large */
-    max-height: 1200px; /* Optional: Prevent canvas from becoming too large */
-
+#plotCanvas {
+    margin: 20px;
+    width: 700px;
+    height: 500px;
+    border: 2px solid #333; /* Black border */
+    padding: 10px;          /* Space between canvas and border */
+    background-color: #f9f9f9; /* Light gray background for contrast */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+    border-radius: 8px;    /* Rounded corners */
 }
 
 .input_ {
     display: flex;
+    justify-content: center;
     align-items: center;
-    flex-direction: column;
-}
-
-.input_ label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 10px 0;
-    font-family: Arial, sans-serif;
-    font-size: 10px;
-    color: #ffffff; /* Text color */
-}
-
-.input_ label input {
-    padding: 8px;
-    border: 2px solid #666;
-    border-radius: 4px;
-    margin-top: 5px;
-    font-size: 14px;
-    font-family: inherit;
-    width: 30%; /* Expand to full width of container */
-    box-sizing: border-box; /* Include padding in width */
-}
-
-.input_ label input:focus {
-    border-color: #0078ff; /* Highlight color on focus */
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 120, 255, 0.5);
+    gap: 20px;
+    margin-top: 20px;
 }
 
 .options {
-    display: flex;              /* Flexbox layout to align items vertically */
-    flex-direction: column;     /* Stack items vertically */
-    align-items: center;        /* Center align content horizontally */
-    justify-content: center;    /* Center items vertically */
-    margin-top: 10px;           /* Space above the options container */
-    padding: 10px;              /* Padding inside the border */
-    border: 2px solid #ce60c8;  /* Set border width */
-    border-radius: 4px;         /* Rounded corners */
-    width: 220px;               /* Set fixed width for the container */
-    max-width: 100%;            /* Prevent it from becoming too wide */
-    box-sizing: border-box;     /* Ensure padding and border are included in the width calculation */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 20px;
 }
 
-.options input {
-    
+#volumedisplay {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    background-color: #c5d3c3; /* Light yellow background */
+    border: 2px solid #6ad18c; /* Gold border */
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); 
+    text-align: center; 
+    display: inline-block; 
 }
 
-
-
-select {
-    width: 200px; /* Optional: Set a fixed width for the select box */
-    text-align: center;
-    margin-top: 5px;
-    padding: 5px;
-    border: 2px solid #666; /* Style to match other inputs */
-    border-radius: 4px;     /* Rounded corners */
-    font-size: 14px;        /* Font size matching design */
-    background-color: #f4f4f4; /* Optional: Background color */
+#volume {
+    color: #0078d7; /* Distinct color for the value */
+    font-size: 22px;
 }
 
-
-/* Make sure the canvas takes up enough space */
-@media screen and (max-width: 768px) {
-    canvas#plotCanvas {
-        width: 90vw;  /* Slightly larger canvas on small screens */
-        height: 75vh;
-    }
-}

@@ -9,7 +9,12 @@
 <body>
     
     <h>Take a look at this beautiful graph!</h>
-    <canvas id="plotCanvas" width="500" height="500"></canvas>
+    <canvas id="plotCanvas" width="700" height="500"></canvas>
+
+    <div id="volumedisplay">
+        Volume approximation: <span id="volume">0.0</span>
+    </div>
+    
 
     
     <div class="input_">
@@ -20,7 +25,7 @@
         
         <div class="options">
             <label>
-                Show Riemann Approximation
+                Show Riemann Approximation:
                 <input type="checkbox" id="sum"> 
             </label>
             
@@ -42,6 +47,7 @@
     
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.3.2/math.js"></script> 
     <script src="static/_math.js"></script>
     <script src="static/shaders.js"></script>
     <script src="static/events.js"></script>

@@ -9,7 +9,7 @@ const MIDDLE = 79
 class FunctionGraph {
     constructor(expr) {
         this.expr = expr
-        this.xz_func = this.parse(this.expr)
+        this.func = this.parse(this.expr)
     }
 
     bounds(xinterval, zinterval) {
@@ -17,6 +17,10 @@ class FunctionGraph {
         var [lx, ux] = xinterval
         var [lz, uz] = zinterval
         return {lx, ux, lz, uz}
+    }
+
+    isImplicit() {
+        return this.expr.includes("=");
     }
 
     riemannTypeResolution(point, dx, dz, type) {
@@ -27,38 +31,57 @@ class FunctionGraph {
                 tp = 1;
         
             case RIGHT:
-                height = this.xz_func(x+dx, z+dz);
+                height = this.func(x+dx, z+dz);
                 break;
             
             case MIDDLE:
-                height = this.xz_func(x+dx/2, z+dz/2);
+                height = this.func(x+dx/2, z+dz/2);
                 break;
 
             default:
-                height = this.xz_func(x, z);
+                height = this.func(x, z);
         }
         return height;
     }
 
     parse(expr) {
+        try {
+            eval(`(x, z) => ${expr}`)(0, 0)
+        } catch {
+            return this.func
+        }
         return eval(`(x, z) => ${expr}`)
     }
 
     updateFunc(expr) {
-        this.xz_func = this.parse(expr)
+        this.expr = expr
+        if (!this.isImplicit()) {
+            this.func = this.parse(expr)
+        }
     }
 
-    sample(xinterval, zinterval, rate) {
+    nonImplicitSample(xinterval, zinterval, rate) {
         let d = 1 / rate
         let samples = [];
         const _bounds = this.bounds(xinterval, zinterval);
         for (let x = _bounds.lx; x < _bounds.ux; x += d) {
             for (let z = _bounds.lz; z < _bounds.uz; z += d) {
-                samples.push([x, this.xz_func(x, z), z])
+                samples.push([x, this.func(x, z), z])
 
             }
         }
         return samples;
+    }
+
+    implicitSample(xinterval, zinterval, rate) {
+        return [2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6];
+    }
+
+    sample(...args) {
+        if (!this.isImplicit()) {
+            return this.nonImplicitSample(...args);
+        }
+        return this.implicitSample(...args);
     }
 
     riemannPrisms(xinterval, zinterval, xrate, zrate, type) {
@@ -106,20 +129,24 @@ function graphTesellation(samplesX, samplesY) {
 
 function rectPrismTesellation(rectAmount) {
     let indices = [];
+    let normals = [];
     for (let i = 0; i < rectAmount; i++) {
         const offset = i * 8; // Each prism has 8 vertices (4 bottom + 4 top)
 
         // Bottom face
         indices.push(offset + 0, offset + 1, offset + 2);
         indices.push(offset + 0, offset + 2, offset + 3);
+        // 
 
         // Top face
         indices.push(offset + 4, offset + 5, offset + 6);
         indices.push(offset + 4, offset + 6, offset + 7);
+        // 
 
         // Front face
         indices.push(offset + 0, offset + 1, offset + 5);
         indices.push(offset + 0, offset + 5, offset + 4);
+        // 
 
         // Back face
         indices.push(offset + 2, offset + 3, offset + 7);
@@ -134,6 +161,20 @@ function rectPrismTesellation(rectAmount) {
         indices.push(offset + 1, offset + 6, offset + 5);
     }
     return indices;
+}
+
+function riemannPrismNormals(rectAmount) {
+    let normals = [];
+    for (let _ = 0; _ < rectAmount; _++) {
+        normals.push([
+            [0, -1, 0],
+            [0,  1, 0],
+            [0,  0, 1],
+            [0,  0, -1],
+            [-1, 0, 0],
+            [1, 0, 0],
+        ])
+    }
 }
 
 
@@ -193,18 +234,6 @@ function intervalLength(interval) {
     return interval[1] - interval[0]
 }
 
-function gridVertices(xinterval, yinterval, sample_length) {
-    z = 0;
-    let xgrid = [];
-    let ygrid = [];
-    let xstart = yinterval[0];
-    let ystart = xinterval[0];
-    for (let i = xstart; i < yinterval[1]; i += sample_length) {
-        xgrid.push([])
-    }
-    for (let i = ystart; i < xinterval[1]; i += sample_length) {
-        ygrid.push([])
-    }
-
+function getNormal(p1, p2, p3) {
+    return math.matrix([2, 3, 4])
 }
-
