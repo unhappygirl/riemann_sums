@@ -30,7 +30,7 @@ function onMouseMove(event) {
         // Do something with the movement (for example, log it or move an object)
         deltaX = deltaX / 360
         deltaY = deltaY / 360
-        console.log("Delta X: " + deltaX + ", Delta Y: " + deltaY);
+        //console.log("Delta X: " + deltaX + ", Delta Y: " + deltaY);
     }
     else {
         deltaX = 0;

@@ -198,7 +198,7 @@ class MyOpenGLController {
         // construct the view matrix
         let radius = this.intervals[2][1]*5
         this.buildView([radius * Math.cos(yDrag) * Math.cos(xDrag), radius * Math.cos(xDrag) * Math.sin(yDrag), radius * Math.sin(xDrag)]);
-        console.log(xDrag, this.cameraPos);
+        //console.log(xDrag, this.cameraPos);
         //
 
         this.setupMatrices();
@@ -210,6 +210,8 @@ class MyOpenGLController {
             inputs.yrects, 
             eval(inputs.sumType)
         );
+
+        console.log(eval(inputs.sumType))
 
         this.populateVertexBuffers(graphData.vertices, riemannData.vertices);
         this.draw(this.axesBuffer, lineIndices(6), this.gl.LINES, BLACK);

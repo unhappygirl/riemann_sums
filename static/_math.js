@@ -28,8 +28,9 @@ class FunctionGraph {
         let height;
         switch (type) {
             case TRAPEZOIDAL:
-                tp = 1;
-        
+                height = "varying"; // !
+                break;
+
             case RIGHT:
                 height = this.func(x+dx, z+dz);
                 break;
@@ -90,15 +91,28 @@ class FunctionGraph {
         let vertices = [];
         const _bounds = this.bounds(xinterval, zinterval);
         let volume = 0;
+        let h1, h2, h3, h4;
         for (let x = _bounds.lx; x < _bounds.ux; x += dx) {
             for (let z = _bounds.lz; z < _bounds.uz; z += dz) {
                 let h = this.riemannTypeResolution([x, z], dx, dz, type)
-                volume += dx*dz*h;
+                if (h == "varying") {
+                    h1 = this.func(x, z)
+                    h2 = this.func(x+dx, z)
+                    h3 = this.func(x+dx, z+dz)
+                    h4 = this.func(x, z+dz)
+                    volume += dx*dz*((h1+h2+h3+h4)/4);
+
+                }
+                else {
+                    volume += dx*dz*h;
+                    [h1, h2, h3, h4] = Array(4).fill(h);
+                }
+                
                 for (let n = 0; n < 2; n++) {    
-                    vertices.push([x, h*n, z],
-                             [x+dx, h*n, z],
-                             [x+dx, h*n, z+dz],
-                             [x, h*n, z+dz],
+                    vertices.push([x, h1*n, z],
+                        [x+dx, h2*n, z],
+                        [x+dx, h3*n, z+dz],
+                        [x, h4*n, z+dz],
                     )
                 }
             }
@@ -129,7 +143,6 @@ function graphTesellation(samplesX, samplesY) {
 
 function rectPrismTesellation(rectAmount) {
     let indices = [];
-    let normals = [];
     for (let i = 0; i < rectAmount; i++) {
         const offset = i * 8; // Each prism has 8 vertices (4 bottom + 4 top)
 
