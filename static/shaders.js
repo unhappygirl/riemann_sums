@@ -1,5 +1,3 @@
-
-
 vertexShader = `
             attribute vec3 position;
             attribute vec3 normal;
@@ -8,7 +6,7 @@ vertexShader = `
             uniform mat4 viewMatrix;
             uniform vec3 lightDirection; // Direction of the light source, in world coordinates
             uniform vec4 objectColor;    // Base color of the object
-            uniform bool interpolate;
+            uniform bool lighting;
 
             varying vec4 v_color;
 
@@ -26,7 +24,13 @@ vertexShader = `
 
                 // Compute the final color
                 vec4 diffuseColor = diffuseFactor * lightColor;
-                v_color = objectColor;
+                if (lighting) {
+                    v_color = objectColor * diffuseFactor;
+                } 
+                else {
+                    v_color = objectColor;
+                }
+                
 
                 // Transform the vertex position
                 gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
