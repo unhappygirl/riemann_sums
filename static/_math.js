@@ -46,22 +46,21 @@ class FunctionGraph {
 
   parse(expr) {
     try {
-      eval(`(x, z) => ${expr}`)(0, 0);
+      evaluatex(expr)({ x: 2, z: 3 });
     } catch {
-      return this.func;
+        return this.func;
     }
-    return eval(`(x, z) => ${expr}`);
+    const compiled = evaluatex(expr);
+    return (x, z) => compiled({ x: x, z: z });
   }
 
   updateFunc(expr) {
     this.expr = expr;
     if (!this.isImplicit()) {
-      this.func = this.parse(expr);
+      this.func = this.parse(this.expr);
+    } else {
+      this.func = (x, z) => this.parse(this.expr)(x, z) == 0;
     }
-    else {
-        
-    }
-    
   }
 
   nonImplicitSample(xinterval, zinterval, rate) {
@@ -83,8 +82,9 @@ class FunctionGraph {
     for (let x = _bounds.lx; x < _bounds.ux; x += d) {
       for (let z = _bounds.lz; z < _bounds.uz; z += d) {
         for (let y = 0; y < array.length; y++) {
-            
-            
+          if (this.func(x, y, z)) {
+            samples.push([x, y, z]);
+          }
         }
       }
     }
@@ -100,7 +100,9 @@ class FunctionGraph {
 
   riemannPrisms(xinterval, zinterval, xrate, zrate, type) {
     const dx = 1 / xrate;
+    console.log(dx)
     const dz = 1 / zrate;
+    console.log(dz)
     let vertices = [];
     const _bounds = this.bounds(xinterval, zinterval);
     let volume = 0;

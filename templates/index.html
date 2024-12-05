@@ -10,18 +10,60 @@
     
     <h>Take a look at this beautiful graph!</h>
     <canvas id="plotCanvas" width="700" height="500"></canvas>
+    <!-- Scripts -->
+    <script src="static/node_modules/evaluatex/dist/evaluatex.min.js"></script>
+    <script type="text/javascript">
+        try {
+            console.log(evaluatex("x\\cdot z")({x: 31, z: 3}));
+        }
+        catch(err) {
+            alert(err)
+        }
+    </script>
+    <link rel="stylesheet" href="static/node_modules/mathquill/build/mathquill.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="static/node_modules/mathquill/build/mathquill.js"></script>
+    <script>
+        try {
+            var MQ = MathQuill.getInterface(2);
+        }
+        catch {
+            alert("MathQuill failed!")
+        }
+    
+    </script>   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.3.2/math.js"></script> 
+    <script src="static/_math.js"></script>
+    <script src="static/shaders.js"></script>
+    <!----->
 
     <div id="volumedisplay">
         Volume approximation: <span id="volume">0.0</span>
     </div>
-    
 
-    
     <div class="input_">
         <label>
-            <h2>Input a function in terms of x and z (e.g., x+z or x**2+z**2):</h2>
-            <input type="text" id="funcinput" placeholder="Enter function here">
+            <label> Note, implicit functions must be in the form: 
+                \(f(x, y, z) = 0\), e.g. \(x + y + z = 0\)
+            </label>
+            
+            <p>Input a function in terms of x and z (e.g., \(x+z\) or \(x^2+z^2\)): </p>
+            <p>\(f(x, z) = \)  <span id="math-field"></p>
+
+            <script>
+                var mathFieldSpan = document.getElementById('math-field');
+                var latexSpan = document.getElementById('latex');
+
+                var MQ = MathQuill.getInterface(2); // for backcompat
+                var mathField = MQ.MathField(mathFieldSpan, {
+                spaceBehavesLikeTab: true, // configurable
+                });
+            </script>
+
         </label>
+    
         
         <div class="options">
             <label>
@@ -36,22 +78,28 @@
                 <option value="MIDDLE">Middle</option>
                 <option value="TRAPEZOIDAL">Trapezoidal</option>
             </select>
+
             <label for="xrects"> prisms on x: </label>
-            <input type="range" min="0.2" max="2" value="0.3" step="0.1" class="slider" id="xrects">
+            <input type="range" min="0.1" max="2" value="0.3" step="0.1" class="slider" id="xrects">
+            <span id="xrects-value">6 prisms</span>
             
             <label for="yrects"> prisms on y: </label>
-            <input type="range" min="0.2" max="2" value="0.3" step="0.1" class="slider" id="yrects">
-            
+            <input type="range" min="0.1" max="2" value="0.3" step="0.1" class="slider" id="yrects">
+            <span id="yrects-value">6 prisms</span>
+
+            <script>
+            document.getElementById('xrects').addEventListener('input', function() {
+                document.getElementById('xrects-value').textContent = `${20*this.value} prisms`;
+            });
+
+            document.getElementById('yrects').addEventListener('input', function() {
+                document.getElementById('yrects-value').textContent = `${20*this.value} prisms`;
+            });
+            </script>
+    
         </div>
     </div> 
-    
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.3.2/math.js"></script> 
-    <script src="static/_math.js"></script>
-    <script src="static/shaders.js"></script>
     <script src="static/events.js"></script>
     <script src="static/plotter.js"></script>
-    <!----->
 </body>
 </html>

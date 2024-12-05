@@ -55,7 +55,7 @@ canvas.addEventListener("mousemove", onMouseMove);
 canvas.addEventListener("mouseup", onMouseUp);
 
 function get_inputs() {
-  const func = document.getElementById("funcinput").value;
+  const func = mathField.latex();
   const sum = document.getElementById("sum").checked;
   const sumType = document.getElementById("sumoptions").value;
   const xrects = document.getElementById("xrects").value;

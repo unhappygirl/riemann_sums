@@ -1,10 +1,10 @@
-const SAMPLE_RATE = 20;
+const SAMPLE_RATE = 10;
 
 const WHITE = [1.0, 1.0, 1.0, 1];
 const BLACK = [0, 0, 0, 1];
 const PRISM_COLOR = [0, 0.2, 0.3, 0.65];
 const GRAPH_COLOR = [0.3, 0, 0, 0.6];
-const LINE_COLOR = [1, 0.2, 0.6, 1];
+const LINE_COLOR = [1, 0.2, 0.6, 0.8];
 
 class MyBuilder {
   constructor(graph) {
@@ -338,19 +338,19 @@ class MyOpenGLController {
     this.gl.depthFunc(this.gl.LEQUAL);
 
     this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA); // Standard blending mode
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
     this.render(graph, 0, 0);
   }
 }
 
 function main() {
-  let mygraph = new FunctionGraph("Math.sqrt(x)");
+  let mygraph = new FunctionGraph("x^2 + z");
   let controller = new MyOpenGLController(
     [
-      [-5, 5],
-      [-5, 5],
-      [-5, 5],
+      [-10, 10],
+      [-10, 10],
+      [-10, 10],
     ],
     mygraph
   );

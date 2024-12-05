@@ -4,14 +4,14 @@ vertexShader = `
 
             uniform mat4 projectionMatrix;
             uniform mat4 viewMatrix;
-            uniform vec3 lightDirection; // Direction of the light source, in world coordinates
-            uniform vec4 objectColor;    // Base color of the object
+            uniform vec3 lightDirection;
+            uniform vec4 objectColor;    
             uniform bool lighting;
 
             varying vec4 v_color;
 
             void main() {
-                vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0); // White light
+                vec4 lightColor = vec4(1.0, 1.0, 1.0, 1.0); 
                 // Transform the normal to world space
                 vec3 transformedNormal = mat3(viewMatrix) * normal;
                 transformedNormal = normalize(transformedNormal);
