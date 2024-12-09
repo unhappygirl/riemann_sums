@@ -46,12 +46,12 @@ class FunctionGraph {
 
   parse(expr) {
     try {
-      evaluatex(expr)({ x: 2, z: 3 });
+      evaluatex(expr)({ x: 2, y: 3 });
     } catch {
         return this.func;
     }
     const compiled = evaluatex(expr);
-    return (x, z) => compiled({ x: x, z: z });
+    return (x, y) => compiled({ x: x, y: y });
   }
 
   updateFunc(expr) {
@@ -59,7 +59,7 @@ class FunctionGraph {
     if (!this.isImplicit()) {
       this.func = this.parse(this.expr);
     } else {
-      this.func = (x, z) => this.parse(this.expr)(x, z) == 0;
+      this.func = (x, y) => this.parse(this.expr)(x, y) == 0;
     }
   }
 
@@ -75,13 +75,13 @@ class FunctionGraph {
     return samples;
   }
 
-  implicitSample(xinterval, zinterval, rate) {
+  implicitSample(xinterval, yinterval, zinterval, rate) {
     let d = 1 / rate;
     let samples = [];
     const _bounds = this.bounds(xinterval, zinterval);
     for (let x = _bounds.lx; x < _bounds.ux; x += d) {
       for (let z = _bounds.lz; z < _bounds.uz; z += d) {
-        for (let y = 0; y < array.length; y++) {
+        for (let y = yinterval[0]; y < yinterval[1]; y++) {
           if (this.func(x, y, z)) {
             samples.push([x, y, z]);
           }
@@ -246,8 +246,4 @@ function lineIndices(length) {
 
 function intervalLength(interval) {
   return interval[1] - interval[0];
-}
-
-function getNormal(p1, p2, p3) {
-  return math.matrix([2, 3, 4]);
 }

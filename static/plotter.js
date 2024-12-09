@@ -345,7 +345,7 @@ class MyOpenGLController {
 }
 
 function main() {
-  let mygraph = new FunctionGraph("x^2 + z");
+  let mygraph = new FunctionGraph("\\sqrt{x^2+y^2}");
   let controller = new MyOpenGLController(
     [
       [-10, 10],
