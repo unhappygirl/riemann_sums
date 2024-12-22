@@ -1,8 +1,10 @@
 const ORIGIN = [0, 0, 0];
 
 const TRAPEZOIDAL = 38;
-const LEFT = 39;
-const RIGHT = 40;
+const LEFTTOP = 39;
+const RIGHTTOP = 40;
+const LEFTBOTTOM = 49;
+const RIGHTBOTTOM = 50;
 const MIDDLE = 79;
 
 class FunctionGraph {
@@ -30,13 +32,21 @@ class FunctionGraph {
         height = "varying"; // !
         break;
 
-      case RIGHT:
-        height = this.func(x + dx, z + dz);
+      case RIGHTTOP:
+        height = this.func(x + dx, z);
         break;
 
       case MIDDLE:
         height = this.func(x + dx / 2, z + dz / 2);
         break;
+
+      case RIGHTBOTTOM:
+        height = this.func(x + dx, z + dz);
+        break;
+
+      case LEFTBOTTOM:
+        height = this.func(x, z + dz);
+        break; 
 
       default:
         height = this.func(x, z);

@@ -90,7 +90,7 @@ class MyOpenGLController {
     this.fieldOfView = (45 * Math.PI) / 180; // in radians
     this.aspect = this.canvas.clientWidth / this.canvas.clientHeight;
     this.zNear = 0.1;
-    this.zFar = 100.0;
+    this.zFar = 200.0;
 
     this.projectionMatrix = mat4.create();
     mat4.perspective(
