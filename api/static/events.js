@@ -2,6 +2,7 @@
 let isDragging = false;
 let initialX = 0;
 let initialY = 0;
+let isTouching = true;
 
 // Variables to track movement
 let deltaX = 0;
@@ -48,11 +49,39 @@ function onMouseUp() {
   );
 }
 
+
+
+const onTouchStart = (event) => {
+  isTouching = true;
+  const touch = event.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+};
+
+const onTouchMove = (event) => {
+  if (!isTouching) return;
+  const touch = event.touches[0];
+  deltaX = (touch.clientX - touchStartX) * 0.005; // Scale factor for sensitivity
+  deltaY = (touch.clientY - touchStartY) * 0.005;
+
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+};
+
+const onTouchEnd = () => {
+  isTouching = false;
+};
+
+
+
 // Add event listeners
 const canvas = document.getElementById("plotCanvas");
 canvas.addEventListener("mousedown", onMouseDown);
 canvas.addEventListener("mousemove", onMouseMove);
 canvas.addEventListener("mouseup", onMouseUp);
+canvas.addEventListener("touchstart", onTouchStart);
+canvas.addEventListener("touchmove", onTouchMove);
+canvas.addEventListener("touchend", onTouchEnd);
 
 function get_inputs() {
   const func = mathField.latex();

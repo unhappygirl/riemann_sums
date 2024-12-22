@@ -2,7 +2,7 @@ const SAMPLE_RATE = 10;
 
 const WHITE = [1.0, 1.0, 1.0, 1];
 const BLACK = [0, 0, 0, 0.6];
-const PRISM_COLOR = [0, 0.2, 0.3, 0.9];
+const PRISM_COLOR = [0, 0.2, 0.3, 0.6];
 const GRAPH_COLOR = [0.3, 0, 0, 0.5];
 const LINE_COLOR = [1, 0.2, 0.6, 0.3];
 
@@ -279,7 +279,7 @@ class MyOpenGLController {
 
     let inputs = get_inputs();
 
-    if (isDragging) {
+    if (isDragging || isTouching) {
       xDrag += deltaX;
       yDrag += deltaY;
     }
@@ -311,7 +311,13 @@ class MyOpenGLController {
     this.populateVertexBuffers(graphData.vertices, riemannData.vertices);
     this.draw(this.gridBuffer, lineIndices(804), this.gl.LINES, BLACK);
     this.draw(this.axesBuffer, lineIndices(6), this.gl.LINES, LINE_COLOR);
-    this.gl.depthMask(false);
+    //this.gl.depthMask(false);
+    this.draw(
+      this.vertexBuffer,
+      graphData.indices,
+      this.gl.TRIANGLES,
+      GRAPH_COLOR
+    );
     if (inputs.sum) {
       
       this.draw(
@@ -330,14 +336,6 @@ class MyOpenGLController {
         LINE_COLOR
       );
     }
-    this.draw(
-      this.vertexBuffer,
-      graphData.indices,
-      this.gl.TRIANGLES,
-      GRAPH_COLOR
-    );
-    this.gl.depthMask(true);
-      
 
     try {
       graph.updateFunc(inputs.func);
