@@ -27,7 +27,7 @@ function onMouseMove(event) {
     initialX = event.clientX;
     initialY = event.clientY;
 
-    // Do something with the movement (for example, log it or move an object)
+    // Normalize the movement
     deltaX = deltaX / 360;
     deltaY = deltaY / 360;
     //console.log("Delta X: " + deltaX + ", Delta Y: " + deltaY);
@@ -60,6 +60,7 @@ function get_inputs() {
   const sumType = document.getElementById("sumoptions").value;
   const xrects = document.getElementById("xrects").value;
   const yrects = document.getElementById("yrects").value;
+  const zoom = document.getElementById("zoom").value;
 
-  return { func, sum, sumType, xrects, yrects };
+  return { func, sum, sumType, xrects, yrects, zoom};
 }

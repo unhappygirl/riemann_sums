@@ -100,9 +100,7 @@ class FunctionGraph {
 
   riemannPrisms(xinterval, zinterval, xrate, zrate, type) {
     const dx = 1 / xrate;
-    console.log(dx)
     const dz = 1 / zrate;
-    console.log(dz)
     let vertices = [];
     const _bounds = this.bounds(xinterval, zinterval);
     let volume = 0;
@@ -246,4 +244,17 @@ function lineIndices(length) {
 
 function intervalLength(interval) {
   return interval[1] - interval[0];
+}
+
+function gridVertices(xinterval, zinterval, step) {
+  vertices = [];
+  for (let z = zinterval[0]; z <= zinterval[1]; z+=step) {
+    vertices.push([xinterval[0], 0, z])
+    vertices.push([xinterval[1], 0, z])
+  } 
+  for (let x = xinterval[0]; x <= xinterval[1]; x+=step) {
+    vertices.push([x, 0, zinterval[0]])
+    vertices.push([x, 0, zinterval[1]])
+  } 
+  return vertices;
 }

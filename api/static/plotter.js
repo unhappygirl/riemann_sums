@@ -1,10 +1,10 @@
 const SAMPLE_RATE = 10;
 
 const WHITE = [1.0, 1.0, 1.0, 1];
-const BLACK = [0, 0, 0, 1];
-const PRISM_COLOR = [0, 0.2, 0.3, 0.65];
-const GRAPH_COLOR = [0.3, 0, 0, 0.6];
-const LINE_COLOR = [1, 0.2, 0.6, 0.8];
+const BLACK = [0, 0, 0, 0.6];
+const PRISM_COLOR = [0, 0.2, 0.3, 0.9];
+const GRAPH_COLOR = [0.3, 0, 0, 0.5];
+const LINE_COLOR = [1, 0.2, 0.6, 0.3];
 
 class MyBuilder {
   constructor(graph) {
@@ -123,6 +123,7 @@ class MyOpenGLController {
     this.normalBuffer = this.gl.createBuffer();
     this.axesBuffer = this.gl.createBuffer();
     this.riemannBuffer = this.gl.createBuffer();
+    this.gridBuffer = this.gl.createBuffer();
   }
 
   bufferArray(buffer, type, src, mode, arr_func) {
@@ -152,6 +153,14 @@ class MyOpenGLController {
       this.gl.STATIC_DRAW,
       Float32Array
     );
+
+    this.bufferArray(
+      this.gridBuffer,
+      this.gl.ARRAY_BUFFER,
+      gridVertices([-100, 100], [-100, 100], 1).flat(),
+      this.gl.STATIC_DRAW,
+      Float32Array
+    );
   }
 
   populateIndexBuffer(index_array) {
@@ -177,10 +186,10 @@ class MyOpenGLController {
   initCamera() {
     this.cameraPos = [0, 0, this.intervals[2][1] * 10]; // Camera position
     this.cameraTarget = [0, 0, 0]; // Target point (where the camera looks)
-    this.cameraUp = [0, 1, 0]; // Up direction
+    this.cameraUp = [0, 11, 0]; // Up direction
   }
 
-  buildView(pos, target = ORIGIN) {
+  buildView(pos, up, target = ORIGIN) {
     this.cameraPos = pos;
     this.cameraTarget = target;
 
@@ -190,7 +199,7 @@ class MyOpenGLController {
         this.viewMatrix,
         this.cameraPos,
         this.cameraTarget,
-        this.cameraUp
+        up
       );
     } catch (error) {
       console.error("Error in mat4.lookAt:", error);
@@ -270,17 +279,22 @@ class MyOpenGLController {
 
     let inputs = get_inputs();
 
-    xDrag += deltaX;
-    yDrag += deltaY;
+    if (isDragging) {
+      xDrag += deltaX;
+      yDrag += deltaY;
+    }
+    
+    //console.log(xDrag)
 
     // construct the view matrix
-    let radius = this.intervals[2][1] * 5;
+    let radius = this.intervals[2][1] * 5-inputs.zoom;
     this.buildView([
-      radius * Math.cos(yDrag) * Math.cos(xDrag),
-      radius * Math.cos(xDrag) * Math.sin(yDrag),
-      radius * Math.sin(xDrag),
-    ]);
+      radius * Math.cos(3*xDrag) * Math.sin(3*yDrag),
+      radius * Math.cos(3*yDrag),
+      radius * Math.sin(3*xDrag) * Math.sin(3*yDrag)
+    ], [0, 1, 0]);
     //
+    //console.log(this.cameraPos);
 
     this.setupMatrices();
     let graphData = this.builder.buildGraph(
@@ -294,17 +308,12 @@ class MyOpenGLController {
       inputs.yrects,
       eval(inputs.sumType)
     );
-
     this.populateVertexBuffers(graphData.vertices, riemannData.vertices);
-    this.draw(this.axesBuffer, lineIndices(6), this.gl.LINES, BLACK);
-    this.draw(
-      this.vertexBuffer,
-      graphData.indices,
-      this.gl.TRIANGLES,
-      GRAPH_COLOR
-    );
+    this.draw(this.gridBuffer, lineIndices(804), this.gl.LINES, BLACK);
+    this.draw(this.axesBuffer, lineIndices(6), this.gl.LINES, LINE_COLOR);
+    this.gl.depthMask(false);
     if (inputs.sum) {
-      //this.gl.depthMask(false);
+      
       this.draw(
         this.riemannBuffer,
         riemannData.rectIndices,
@@ -313,16 +322,23 @@ class MyOpenGLController {
         false,
         riemannPrismNormals(riemannData.amount)
       );
-      this.gl.depthMask(true);
+
       this.draw(
         this.riemannBuffer,
         riemannData._lineIndices,
         this.gl.LINES,
         LINE_COLOR
       );
-      
-      
     }
+    this.draw(
+      this.vertexBuffer,
+      graphData.indices,
+      this.gl.TRIANGLES,
+      GRAPH_COLOR
+    );
+    this.gl.depthMask(true);
+      
+
     try {
       graph.updateFunc(inputs.func);
     } catch {
@@ -340,7 +356,7 @@ class MyOpenGLController {
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
-    this.render(graph, 0, 0);
+    this.render(graph, 1, Math.PI);
   }
 }
 
