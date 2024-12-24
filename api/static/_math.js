@@ -17,7 +17,9 @@ class FunctionGraph {
     var lx, ux, lz, uz;
     var [lx, ux] = xinterval;
     var [lz, uz] = zinterval;
-    return { lx, ux, lz, uz };
+    var zlength = uz - lz;
+    var xlength = ux - lx;
+    return { lx, ux, lz, uz, xlength, zlength };
   }
 
   isImplicit() {
@@ -77,8 +79,8 @@ class FunctionGraph {
     let d = 1 / rate;
     let samples = [];
     const _bounds = this.bounds(xinterval, zinterval);
-    for (let x = _bounds.lx; x < _bounds.ux; x += d) {
-      for (let z = _bounds.lz; z < _bounds.uz; z += d) {
+    for (let x = _bounds.lx; x <= _bounds.ux; x += d) {
+      for (let z = _bounds.lz; z <= _bounds.uz; z += d) {
         samples.push([x, this.func(x, z), z]);
       }
     }
@@ -108,11 +110,11 @@ class FunctionGraph {
     return this.implicitSample(...args);
   }
 
-  riemannPrisms(xinterval, zinterval, xrate, zrate, type) {
-    const dx = 1 / xrate;
-    const dz = 1 / zrate;
+  riemannPrisms(xinterval, zinterval, xrects, zrects, type) {
     let vertices = [];
     const _bounds = this.bounds(xinterval, zinterval);
+    const dx = _bounds.xlength / xrects;
+    const dz = _bounds.zlength / zrects;
     let volume = 0;
     let h1, h2, h3, h4;
     for (let x = _bounds.lx; x < _bounds.ux; x += dx) {

@@ -35,6 +35,12 @@ class MyBuilder {
   }
 }
 
+function handle_string_num(str_num) {
+  if (str_num === "") return 1;
+  if (isNaN(str_num)) return 1;
+  return Number(str_num);
+}
+
 // class too large, fix by extract subclass
 class MyOpenGLController {
   constructor(intervals, graph) {
@@ -273,45 +279,20 @@ class MyOpenGLController {
     //
   }
 
-  render(graph, xDrag, yDrag) {
-    //this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.gl.useProgram(this.program);
 
-    let inputs = get_inputs();
+  handle_inputs(inputs) {
+    inputs.xrects = handle_string_num(inputs.xrects);
+    inputs.yrects = handle_string_num(inputs.yrects);
+    inputs.x1 = handle_string_num(inputs.x1);
+    inputs.x2 = handle_string_num(inputs.x2);
+    inputs.y1 = handle_string_num(inputs.y1);
+    inputs.y2 = handle_string_num(inputs.y2);
+    return inputs
+  }
 
-    if (isDragging || isTouching) {
-      xDrag += deltaX;
-      yDrag += deltaY;
-    }
-    
-    //console.log(xDrag)
-
-    // construct the view matrix
-    let radius = this.intervals[2][1] * 5-inputs.zoom;
-    this.buildView([
-      radius * Math.cos(3*xDrag) * Math.sin(3*yDrag),
-      radius * Math.cos(3*yDrag),
-      radius * Math.sin(3*xDrag) * Math.sin(3*yDrag)
-    ], [0, 1, 0]);
-    //
-    //console.log(this.cameraPos);
-
-    this.setupMatrices();
-    let graphData = this.builder.buildGraph(
-      this.intervals[0],
-      this.intervals[2]
-    );
-    let riemannData = this.builder.buildRiemann(
-      this.intervals[0],
-      this.intervals[1],
-      inputs.xrects,
-      inputs.yrects,
-      eval(inputs.sumType)
-    );
-    this.populateVertexBuffers(graphData.vertices, riemannData.vertices);
+  draw_all(graphData, riemannData, inputs) {
     this.draw(this.gridBuffer, lineIndices(804), this.gl.LINES, BLACK);
     this.draw(this.axesBuffer, lineIndices(6), this.gl.LINES, LINE_COLOR);
-    //this.gl.depthMask(false);
     this.draw(
       this.vertexBuffer,
       graphData.indices,
@@ -336,6 +317,44 @@ class MyOpenGLController {
         LINE_COLOR
       );
     }
+  }
+
+  render(graph, xDrag, yDrag) {
+    //this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    this.gl.useProgram(this.program);
+    if (isDragging || isTouching) {
+      xDrag += deltaX;
+      yDrag += deltaY;
+    }
+    let inputs = get_inputs();
+    inputs = this.handle_inputs(inputs);
+
+
+    // construct the view matrix
+    let radius = this.intervals[2][1] * 5-inputs.zoom;
+    this.buildView([
+      radius * Math.cos(3*xDrag) * Math.sin(3*yDrag),
+      radius * Math.cos(3*yDrag),
+      radius * Math.sin(3*xDrag) * Math.sin(3*yDrag)
+    ], [0, 1, 0]);
+    //
+    this.setupMatrices();
+
+    let graphData = this.builder.buildGraph(
+      this.intervals[0],
+      this.intervals[2]
+    );
+    let riemannData = this.builder.buildRiemann(
+      [inputs.x1, inputs.x2],
+      [inputs.y1, inputs.y2],
+      inputs.xrects,
+      inputs.yrects,
+      eval(inputs.sumType)
+    );
+    
+
+    this.populateVertexBuffers(graphData.vertices, riemannData.vertices);
+    this.draw_all(graphData, riemannData, inputs);
 
     try {
       graph.updateFunc(inputs.func);
@@ -353,6 +372,7 @@ class MyOpenGLController {
 
     this.gl.enable(this.gl.BLEND);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+
 
     this.render(graph, 1, Math.PI);
   }

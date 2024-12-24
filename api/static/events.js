@@ -49,8 +49,6 @@ function onMouseUp() {
   );
 }
 
-
-
 const onTouchStart = (event) => {
   isTouching = true;
   const touch = event.touches[0];
@@ -72,8 +70,6 @@ const onTouchEnd = () => {
   isTouching = false;
 };
 
-
-
 // Add event listeners
 const canvas = document.getElementById("plotCanvas");
 canvas.addEventListener("mousedown", onMouseDown);
@@ -89,7 +85,11 @@ function get_inputs() {
   const sumType = document.getElementById("sumoptions").value;
   const xrects = document.getElementById("xrects").value;
   const yrects = document.getElementById("yrects").value;
+  const x1 = document.getElementById("x1").value;
+  const x2 = document.getElementById("x2").value;
+  const y1 = document.getElementById("y1").value;
+  const y2 = document.getElementById("y2").value;
   const zoom = document.getElementById("zoom").value;
 
-  return { func, sum, sumType, xrects, yrects, zoom};
+  return { x1, x2, y1, y2, func, sum, sumType, xrects, yrects, zoom };
 }

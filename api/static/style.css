@@ -32,6 +32,10 @@ body {
     margin-left: 20px;
 }
 
+.small-textbox {
+    width: 25px;
+}
+
 #volumedisplay {
     margin-top: 20px;
     font-size: 20px;
