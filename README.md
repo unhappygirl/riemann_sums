@@ -12,5 +12,5 @@ A web app for visualizing double riemann sums, for educational purposes.
 
 ## Todo
 
-- Add implicit function graphs
+- Add implicit function graphing
 - Fix "NaN volume" bugs :smiley:
