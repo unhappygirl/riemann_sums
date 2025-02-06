@@ -9,7 +9,7 @@ def index():
 
 @app.route("/favicon.ico")
 def icon():
-    return open("./favicon.ico", "rb").read()
+    return open("api/favicon.ico", "rb").read()
 
 if __name__ == "__main__":
     app.run("0.0.0.0", 8000)
