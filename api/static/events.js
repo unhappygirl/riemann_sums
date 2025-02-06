@@ -1,16 +1,13 @@
-// Variables to track the initial position
+
 let isDragging = false;
 let initialX = 0;
 let initialY = 0;
 let isTouching = true;
 
-// Variables to track movement
 let deltaX = 0;
 let deltaY = 0;
 
-// Function to handle mouse down event (start dragging)
 function onMouseDown(event) {
-  // Start tracking the mouse position
   isDragging = true;
 
   initialX = event.clientX;
@@ -24,7 +21,6 @@ function onMouseMove(event) {
     deltaX = event.clientX - initialX;
     deltaY = event.clientY - initialY;
 
-    // Update the initial position for next move
     initialX = event.clientX;
     initialY = event.clientY;
 
@@ -93,3 +89,15 @@ function get_inputs() {
 
   return { x1, x2, y1, y2, func, sum, sumType, xrects, yrects, zoom };
 }
+
+function init_inputs() {
+  document.getElementById("x1").value = -10;
+  document.getElementById("x2").value = 10; 
+  document.getElementById("y1").value = -10;
+  document.getElementById("y2").value = 10;
+  document.getElementById("sum").checked = true;
+  document.getElementById("xrects").value = 10;
+  document.getElementById("yrects").value = 10;
+}
+
+init_inputs();

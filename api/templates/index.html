@@ -40,31 +40,33 @@
     <!----->
 
     <div id="volumedisplay">
-        Volume approximation: <span id="volume">0.0</span>
+        Volume approximation: <span id="volume">0.0</span> units cube
     </div>
 
     <div class="input_">
-        <label>
-            
-            <p>Input a function in terms of x and z (e.g., \(x+z\) or \(x^2+z^2\)): </p>
-            <p>\(f(x, y) = \)  <span id="math-field"></p>
+        <div class="funcinput"> 
+            <label>
+                
+                <p>Input a function in terms of x and z (e.g., \(x+y\) or \(x^2+y^2\)): </p>
+                <p>\(f(x, y) = \)  <span id="math-field"></p>
 
-            <script>
-                var mathFieldSpan = document.getElementById('math-field');
-                var latexSpan = document.getElementById('latex');
+                <script>
+                    var mathFieldSpan = document.getElementById('math-field');
+                    var latexSpan = document.getElementById('latex');
 
-                var MQ = MathQuill.getInterface(2); // for backcompat
-                var mathField = MQ.MathField(mathFieldSpan, {
-                spaceBehavesLikeTab: true, // configurable
-                });
-            
-            </script>
-            <p>interval for \(x\): </p>
-            <p>\( [ \)  <input type="text" id="x1", class="small-textbox">, <input type="text" id="x2", class="small-textbox">\( ] \)</p>
-            <p>interval for \(y\): </p>
-            <p>\( [ \)  <input type="text" id="y1", class="small-textbox">, <input type="text" id="y2", class="small-textbox">\( ] \)</p>
+                    var MQ = MathQuill.getInterface(2); // for backcompat
+                    var mathField = MQ.MathField(mathFieldSpan, {
+                    spaceBehavesLikeTab: true, // configurable
+                    });
+                
+                </script>
+                <p>interval for \(x\): </p>
+                <p>\( [ \)  <input type="text" id="x1", class="small-textbox" placeholder="num here...">, <input type="text" id="x2", class="small-textbox" placeholder="num here...">\( ] \)</p>
+                <p>interval for \(y\): </p> 
+                <p>\( [ \)  <input type="text" id="y1", class="small-textbox" placeholder="num here...">, <input type="text" id="y2", class="small-textbox"placeholder="num here..." v>\( ] \)</p>
 
-        </label>
+            </label>
+        </div>
     
         
         <div class="options">
@@ -83,16 +85,16 @@
                 <option value="TRAPEZOIDAL">Trapezoidal</option>
             </select>
 
-            <label for="zoom"> zoom </label>
-            <input type="range" min="-50" max="50" value="50" step="2" class="slider" id="zoom">
+            <label for="zoom"> Zoom: </label>
+            <input type="range" min="-50" max="50" value="20" step="2" class="slider" id="zoom">
 
             <label for="xrects"> prisms on x: </label>
-            <input type="text" id="xrects", class="small-textbox">
-            <span id="xrects-value">6 prisms</span>
+            <input type="text" id="xrects", class="small-textbox" placeholder="10">
+            <span id="xrects-value">10 prisms</span>
             
             <label for="yrects"> prisms on y: </label>
-            <input type="text" id="yrects", class="small-textbox">
-            <span id="yrects-value">6 prisms</span>
+            <input type="text" id="yrects", class="small-textbox" placeholder="10">
+            <span id="yrects-value">10 prisms</span>
 
             <script>
             document.getElementById('xrects').addEventListener('input', function() {

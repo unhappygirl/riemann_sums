@@ -199,7 +199,7 @@ class MyOpenGLController {
     this.cameraPos = pos;
     this.cameraTarget = target;
 
-    // Update view matrix
+    
     try {
       mat4.lookAt(
         this.viewMatrix,
@@ -209,7 +209,7 @@ class MyOpenGLController {
       );
     } catch (error) {
       console.error("Error in mat4.lookAt:", error);
-      throw error; // Re-throw to stop execution
+      throw error; 
     }
   }
 
@@ -255,12 +255,11 @@ class MyOpenGLController {
       this.populateNormalBuffer(normals);
     }
 
-    // Draw the vertices using indexed elements
     this.gl.drawElements(mode, indices.length, this.gl.UNSIGNED_SHORT, 0);
   }
 
   setupMatrices() {
-    // Set the uniform matrices
+    
     const projectionMatrixLocation = this.gl.getUniformLocation(
       this.program,
       "projectionMatrix"
@@ -361,7 +360,6 @@ class MyOpenGLController {
     } catch {
       console.log("Not today!");
     }
-
     requestAnimationFrame(() => this.render(graph, xDrag, yDrag));
   }
 
@@ -374,7 +372,7 @@ class MyOpenGLController {
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
 
-    this.render(graph, 1, Math.PI);
+    this.render(graph, Math.PI/8, Math.PI/2 + Math.PI/16);
   }
 }
 
