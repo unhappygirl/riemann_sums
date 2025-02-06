@@ -11,5 +11,9 @@ def index():
 def icon():
     return open("api/favicon.ico", "rb").read()
 
+@app.route('/npm/<file>') 
+def serve_module(file):
+    return send_from_directory("node_modules", file)
+
 if __name__ == "__main__":
     app.run("0.0.0.0", 8000)
