@@ -12,6 +12,7 @@ function onMouseDown(event) {
 
   initialX = event.clientX;
   initialY = event.clientY;
+  canvas.style.cursor = "grabbing"; // Change cursor to indicate dragging
 }
 
 // Function to handle mouse move event (while dragging)
@@ -43,6 +44,7 @@ function onMouseUp() {
       ", Delta Y: " +
       deltaY
   );
+  canvas.style.cursor = "grab"; // Change cursor back to default
 }
 
 const onTouchStart = (event) => {

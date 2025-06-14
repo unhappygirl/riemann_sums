@@ -1,4 +1,4 @@
-const SAMPLE_RATE = 5;
+const SAMPLE_RATE = 2;
 
 const WHITE = [1.0, 1.0, 1.0, 1];
 const BLACK = [0, 0, 0, 0.6];
@@ -380,9 +380,9 @@ function main() {
   let mygraph = new FunctionGraph("\\sqrt{x^2+y^2}");
   let controller = new MyOpenGLController(
     [
-      [-20, 20],
-      [-20, 20],
-      [-20, 20],
+      [-40, 40],
+      [-40, 40],
+      [-40, 40],
     ],
     mygraph
   );
